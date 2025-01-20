@@ -1,5 +1,11 @@
-body{
-  display: flex;
-  align-items: center;
-  justify-content: center;
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: darkgray;
+    height: 100vh;
+}
+
+canvas {
+    background-color: white;
 }

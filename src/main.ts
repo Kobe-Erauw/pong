@@ -10,3 +10,4 @@ if (!ctx) {
 
 canvas.width = 800;
 canvas.height = 500;
+
