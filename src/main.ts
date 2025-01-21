@@ -13,18 +13,25 @@ class Game {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
     direction: Direction = "none";
+    prevTime: number;
 
     constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
         this.canvas = canvas;
         this.ctx = ctx;
         this.leftPallet = new Pallet(this.ctx);
+        this.prevTime = performance.now();
+
+        this.gameLoop = this.gameLoop.bind(this);
     }
 
-    gameLoop() {
-        this.leftPallet.move(this.direction);
+    gameLoop(timestamp: number) {
+        const timeElapsed = timestamp - this.prevTime;
+        this.prevTime = timestamp;
+
+        this.leftPallet.move(this.direction, timeElapsed);
         this.clearCanvas();
         this.leftPallet.draw();
-        requestAnimationFrame(() => this.gameLoop());
+        requestAnimationFrame(this.gameLoop);
     }
 
     clearCanvas() {
@@ -55,7 +62,7 @@ class Game {
 
     start() {
         this.listen();
-        this.gameLoop();
+        this.gameLoop(performance.now());
     }
 }
 
