@@ -1,4 +1,4 @@
-import {Pallet} from "./rectangle.ts";
+import {Pallet} from "../Pallet.ts";
 import {CanvasSide, PalletDirection} from "./types.ts";
 import {Ball} from "./Ball.ts";
 
@@ -27,6 +27,16 @@ class Game {
         this.gameLoop = this.gameLoop.bind(this);
     }
 
+    getAngleFromPallet(pallet: Pallet) {
+        const maxAngle = 45;
+        const yMiddleBall: number = this.ball.position.y + this.ball.size.h / 2;
+        const yMiddlePallet: number = pallet.position.y + pallet.size.h / 2;
+
+        const relativePosBall = yMiddlePallet - yMiddleBall;
+        const factor = maxAngle / (pallet.size.h / 2);
+        return relativePosBall * factor * -1;
+    }
+
     gameLoop(timestamp: number) {
         const timeElapsed = timestamp - this.prevTime;
         this.prevTime = timestamp;
@@ -34,28 +44,34 @@ class Game {
         this.leftPallet.move(this.direction, timeElapsed);
         this.ball.move(timeElapsed);
 
+
         if (this.ballCollidesWithPallet(this.ball, this.leftPallet)) {
+            console.log("voorRedirect:")
+            console.log(this.ball.direction)
             this.ball.position.x = this.leftPallet.position.x + this.leftPallet.size.w;
-            this.ball.speed.dx *= -1
+            this.ball.direction.x *= -1
+            this.ball.setDirectionFromDegrees(this.getAngleFromPallet(this.leftPallet));
+            console.log("naaRedirect")
+            console.log(this.ball.direction)
         }
 
-        const canvasSide = this.ballCollidesWithCanvas(this.ball);
-        if (canvasSide) {
-            if (canvasSide == "left") {
+        const canvasside = this.ballcollideswithcanvas(this.ball);
+        if (canvasside) {
+            if (canvasside == "left") {
                 this.ball.position.x = 0;
-                this.ball.speed.dx *= -1;
+                this.ball.direction.x *= -1;
             }
-            if (canvasSide == "right") {
+            if (canvasside == "right") {
                 this.ball.position.x = this.canvas.width - this.ball.size.w;
-                this.ball.speed.dx *= -1;
+                this.ball.direction.x *= -1;
             }
-            if (canvasSide == "top") {
+            if (canvasside == "top") {
                 this.ball.position.y = 0;
-                this.ball.speed.dy *= -1;
+                this.ball.direction.y *= -1;
             }
-            if (canvasSide == "bottom") {
+            if (canvasside == "bottom") {
                 this.ball.position.y = this.canvas.height - this.ball.size.h;
-                this.ball.speed.dy *= -1;
+                this.ball.direction.y *= -1;
             }
         }
         this.clearCanvas();
@@ -64,7 +80,7 @@ class Game {
         requestAnimationFrame(this.gameLoop);
     }
 
-    ballCollidesWithCanvas(ball: Ball): CanvasSide {
+    ballcollideswithcanvas(ball: Ball): CanvasSide {
         if (this.ball.position.x > canvas.width - ball.size.w) return "right";
         if (this.ball.position.x < 0) return "left";
         if (this.ball.position.y < 0) return "top";
