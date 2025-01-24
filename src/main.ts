@@ -1,4 +1,4 @@
-import {Pallet} from "../Pallet.ts";
+import {Pallet} from "./Pallet.ts";
 import {CanvasSide, PalletDirection} from "./types.ts";
 import {Ball} from "./Ball.ts";
 
@@ -28,7 +28,7 @@ class Game {
     }
 
     getAngleFromPallet(pallet: Pallet) {
-        const maxAngle = 45;
+        const maxAngle = 30;
         const yMiddleBall: number = this.ball.position.y + this.ball.size.h / 2;
         const yMiddlePallet: number = pallet.position.y + pallet.size.h / 2;
 
@@ -44,7 +44,15 @@ class Game {
         this.leftPallet.move(this.direction, timeElapsed);
         this.ball.move(timeElapsed);
 
+        this.checkCollisions();
 
+        this.clearCanvas();
+        this.leftPallet.draw();
+        this.ball.draw();
+        requestAnimationFrame(this.gameLoop);
+    }
+
+    checkCollisions() {
         if (this.ballCollidesWithPallet(this.ball, this.leftPallet)) {
             console.log("voorRedirect:")
             console.log(this.ball.direction)
@@ -74,10 +82,6 @@ class Game {
                 this.ball.direction.y *= -1;
             }
         }
-        this.clearCanvas();
-        this.leftPallet.draw();
-        this.ball.draw();
-        requestAnimationFrame(this.gameLoop);
     }
 
     ballcollideswithcanvas(ball: Ball): CanvasSide {

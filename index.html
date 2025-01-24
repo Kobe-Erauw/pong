@@ -2,11 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>pong</title>
+    <title>Pong</title>
     <link rel="stylesheet" href="./src/style.css">
 </head>
 <body>
-<canvas></canvas>
+<div class="game-container">
+    <div class="ui">
+        <div class="scoreboard">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="high-score">High Score: <span id="high-score">0</span></div>
+        </div>
+        <div class="leaderboard">
+            <h3>Leaderboard</h3>
+            <ul id="leaderboard-list">
+                <!-- Dynamisch gegenereerde scores -->
+            </ul>
+        </div>
+    </div>
+    <canvas></canvas>
+</div>
 <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

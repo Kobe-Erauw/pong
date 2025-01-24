@@ -1,13 +1,13 @@
-import {Rectangle} from "./src/rectangle";
-import {PalletDirection, Position, Size} from "./src/types";
+import {Rectangle} from "./rectangle.ts";
+import {PalletDirection, Position, Size} from "./types.ts";
 
 export class Pallet extends Rectangle {
     speed: number = 300; // px/second
 
     constructor(ctx: CanvasRenderingContext2D) {
-        const size: Size = {w: 10, h: 80};
+        const size: Size = {w: 10, h: 100};
         const position: Position = {x: 0, y: (ctx.canvas.height - size.h) / 2}
-        super(position, size, ctx);
+        super(position, size, ctx, "#A5D6A7");
     }
 
     move(direction: PalletDirection, timeExpired: number) {

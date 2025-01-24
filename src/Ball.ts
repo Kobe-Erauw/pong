@@ -7,9 +7,9 @@ export class Ball extends Rectangle {
     direction: Direction
 
     constructor(ctx: CanvasRenderingContext2D) {
-        const size: Size = {w: 10, h: 10};
+        const size: Size = {w: 15, h: 15};
         const position: Position = {x: (ctx.canvas.width - size.w) / 2, y: (ctx.canvas.height - size.h) / 2}
-        super(position, size, ctx);
+        super(position, size, ctx, "#FF7043");
         this.speed = 1000;
         this.direction = {x: -1, y: 0};
     }
