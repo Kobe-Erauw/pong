@@ -6,8 +6,6 @@ const canvas: HTMLCanvasElement = document.querySelector("canvas") as HTMLCanvas
 const ctx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D;
 const scoreElement: HTMLSpanElement = document.querySelector("#score") as HTMLSpanElement;
 const highScoreElement: HTMLSpanElement = document.querySelector("#high-score") as HTMLSpanElement;
-canvas.width = 800;
-canvas.height = 500;
 
 
 class Game {
@@ -24,6 +22,8 @@ class Game {
 
     constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scoreElement: HTMLSpanElement, highScoreElement: HTMLSpanElement) {
         this.canvas = canvas;
+        canvas.width = 800;
+        canvas.height = 500;
         this.ctx = ctx;
         this.leftPallet = new Pallet(this.ctx);
         this.ball = new Ball(this.ctx);
@@ -143,11 +143,13 @@ class Game {
         this.score = 0;
         this.updateUI();
         this.canvas.style.boxShadow = "0 0 20px red";
-        this.canvas.style.borderColor = "red"
+        this.canvas.style.borderColor = "red";
+        this.ball.speed = 900;
     }
 
     private addPointToScore() {
         this.score += 1;
+        this.ball.speed += 10;
         if (this.score > this.highScore) this.highScore = this.score;
         this.updateUI();
         this.canvas.style.boxShadow = "0 0 20px #00ff00";

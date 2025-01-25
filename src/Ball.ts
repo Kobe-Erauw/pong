@@ -10,18 +10,14 @@ export class Ball extends Rectangle {
         const size: Size = {w: 15, h: 15};
         const position: Position = {x: (ctx.canvas.width - size.w) / 2, y: (ctx.canvas.height - size.h) / 2}
         super(position, size, ctx, "#FF7043");
-        this.speed = 1000;
+        this.speed = 900;
         this.direction = {x: -1, y: 0};
+        this.setDirectionFromDegrees(1);
     }
 
     move(timeExpired: number) {
         this.position.x += this.direction.x * this.speed * timeExpired / 1000;
         this.position.y += this.direction.y * this.speed * timeExpired / 1000;
-    }
-
-    setDirectionFromYComponent(y: number) {
-        this.direction.x = Math.sqrt(1 - Math.pow(y, 2));
-        this.direction.y = y;
     }
 
     setDirectionFromDegrees(angle: number) {
