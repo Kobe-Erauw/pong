@@ -4,7 +4,8 @@ import {Ball} from "./Ball.ts";
 
 const canvas: HTMLCanvasElement = document.querySelector("canvas") as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D;
-
+const scoreElement: HTMLSpanElement = document.querySelector("#score") as HTMLSpanElement;
+const highScoreElement: HTMLSpanElement = document.querySelector("#high-score") as HTMLSpanElement;
 canvas.width = 800;
 canvas.height = 500;
 
@@ -16,15 +17,22 @@ class Game {
     ctx: CanvasRenderingContext2D;
     direction: PalletDirection = "none";
     prevTime: number;
+    scoreElement: HTMLSpanElement;
+    highscoreElement: HTMLSpanElement;
+    score: number;
+    highScore: number;
 
-    constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+    constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scoreElement: HTMLSpanElement, highScoreElement: HTMLSpanElement) {
         this.canvas = canvas;
         this.ctx = ctx;
         this.leftPallet = new Pallet(this.ctx);
         this.ball = new Ball(this.ctx);
         this.prevTime = performance.now();
-
+        this.scoreElement = scoreElement;
+        this.highscoreElement = highScoreElement;
         this.gameLoop = this.gameLoop.bind(this);
+        this.score = 0;
+        this.highScore = 0;
     }
 
     getAngleFromPallet(pallet: Pallet) {
@@ -54,13 +62,10 @@ class Game {
 
     checkCollisions() {
         if (this.ballCollidesWithPallet(this.ball, this.leftPallet)) {
-            console.log("voorRedirect:")
-            console.log(this.ball.direction)
             this.ball.position.x = this.leftPallet.position.x + this.leftPallet.size.w;
-            this.ball.direction.x *= -1
+            this.ball.direction.x *= -1;
             this.ball.setDirectionFromDegrees(this.getAngleFromPallet(this.leftPallet));
-            console.log("naaRedirect")
-            console.log(this.ball.direction)
+            this.addPointToScore();
         }
 
         const canvasside = this.ballcollideswithcanvas(this.ball);
@@ -68,6 +73,7 @@ class Game {
             if (canvasside == "left") {
                 this.ball.position.x = 0;
                 this.ball.direction.x *= -1;
+                this.resetScore();
             }
             if (canvasside == "right") {
                 this.ball.position.x = this.canvas.width - this.ball.size.w;
@@ -127,7 +133,27 @@ class Game {
         return (rec1.position.x < rec2.position.x + rec2.size.w && rec1.position.x > rec1.position.x - rec2.size.w)
             && (rec1.position.y > rec2.position.y - rec1.size.h && rec1.position.y < rec2.position.y + rec2.size.h)
     }
+
+    updateUI() {
+        this.highscoreElement.textContent = this.highScore.toString();
+        this.scoreElement.textContent = this.score.toString();
+    }
+
+    resetScore() {
+        this.score = 0;
+        this.updateUI();
+        this.canvas.style.boxShadow = "0 0 20px red";
+        this.canvas.style.borderColor = "red"
+    }
+
+    private addPointToScore() {
+        this.score += 1;
+        if (this.score > this.highScore) this.highScore = this.score;
+        this.updateUI();
+        this.canvas.style.boxShadow = "0 0 20px #00ff00";
+        this.canvas.style.borderColor = "#00ff00"
+    }
 }
 
-const game: Game = new Game(canvas, ctx);
+const game = new Game(canvas, ctx, scoreElement, highScoreElement);
 game.start();
