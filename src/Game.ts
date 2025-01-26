@@ -1,6 +1,7 @@
 import {Pallet} from "./Pallet.ts";
 import {Ball} from "./Ball.ts";
 import {CanvasSide, PalletDirection} from "./types.ts";
+import {DBService} from "./DBService.ts";
 
 export class Game {
     leftPallet: Pallet;
@@ -13,9 +14,11 @@ export class Game {
     highscoreElement: HTMLSpanElement;
     score: number;
     highScore: number;
+    dbService: DBService;
 
-    constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scoreElement: HTMLSpanElement, highScoreElement: HTMLSpanElement) {
+    constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scoreElement: HTMLSpanElement, highScoreElement: HTMLSpanElement, dbService: DBService) {
         this.canvas = canvas;
+        this.dbService = dbService;
         canvas.width = 800;
         canvas.height = 500;
         this.ctx = ctx;
@@ -67,6 +70,9 @@ export class Game {
             if (canvasside == "left") {
                 this.ball.position.x = 0;
                 this.ball.direction.x *= -1;
+                if (this.score > this.highScore) {
+                    this.setHighScore(this.score);
+                }
                 this.resetScore();
             }
             if (canvasside == "right") {
@@ -128,14 +134,13 @@ export class Game {
             && (rec1.position.y > rec2.position.y - rec1.size.h && rec1.position.y < rec2.position.y + rec2.size.h)
     }
 
-    updateUI() {
-        this.highscoreElement.textContent = this.highScore.toString();
+    updateScoreUI() {
         this.scoreElement.textContent = this.score.toString();
     }
 
     resetScore() {
         this.score = 0;
-        this.updateUI();
+        this.updateScoreUI();
         this.canvas.style.boxShadow = "0 0 20px red";
         this.canvas.style.borderColor = "red";
         this.ball.speed = 900;
@@ -144,9 +149,14 @@ export class Game {
     private addPointToScore() {
         this.score += 1;
         this.ball.speed += 10;
-        if (this.score > this.highScore) this.highScore = this.score;
-        this.updateUI();
+        this.updateScoreUI();
         this.canvas.style.boxShadow = "0 0 20px #00ff00";
         this.canvas.style.borderColor = "#00ff00"
+    }
+
+    private setHighScore(score: number) {
+        this.highScore = score;
+        this.highscoreElement.textContent = this.highScore.toString();
+        this.dbService.insertHighScore({name: "test3", score: this.highScore, date: null})
     }
 }
