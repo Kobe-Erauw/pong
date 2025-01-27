@@ -72,6 +72,73 @@ body {
     border-bottom: 1px solid rgba(0, 255, 0, 0.5);
 }
 
+.usernamePopup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9); /* Semi-transparante achtergrond */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Boven andere elementen */
+    visibility: hidden; /* Verborgen standaard */
+    opacity: 0; /* Verborgen standaard */
+    transition: visibility 0s, opacity 0.3s ease-in-out; /* Fade-in/out animatie */
+}
+
+.usernamePopup.hidden {
+    visibility: hidden;
+    opacity: 0;
+}
+
+.usernamePopup .popup-content {
+    background: #000000; /* Donkere achtergrond */
+    border: 2px solid #00ff00; /* Neonrand */
+    box-shadow: 0 0 20px #00ff00; /* Glow-effect */
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+.usernamePopup input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #00ff00;
+    border-radius: 5px;
+    background: #000;
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+    box-shadow: 0 0 5px #00ff00;
+}
+
+.usernamePopup button {
+    padding: 10px 20px;
+    background: #00ff00;
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 0 5px #00ff00;
+    transition: background 0.3s ease-in-out;
+}
+
+.usernamePopup button:hover {
+    background: #009900;
+}
+
+/* Toon popup wanneer nodig */
+.usernamePopup.visible {
+    visibility: visible;
+    opacity: 1;
+}
+
+
 /* Canvas */
 canvas {
     border: 8px solid #00ff00; /* Neon groene rand */

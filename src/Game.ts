@@ -16,7 +16,8 @@ export class Game {
     highScore: number;
     dbService: DBService;
 
-    constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scoreElement: HTMLSpanElement, highScoreElement: HTMLSpanElement, dbService: DBService) {
+    constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scoreElement: HTMLSpanElement,
+                highScoreElement: HTMLSpanElement, dbService: DBService, highScore: number) {
         this.canvas = canvas;
         this.dbService = dbService;
         canvas.width = 800;
@@ -29,7 +30,8 @@ export class Game {
         this.highscoreElement = highScoreElement;
         this.gameLoop = this.gameLoop.bind(this);
         this.score = 0;
-        this.highScore = 0;
+        this.highScore = highScore;
+        this.setHighScore(highScore);
     }
 
     getAngleFromPallet(pallet: Pallet) {
@@ -143,13 +145,6 @@ export class Game {
             this.direction = "none";
         });
 
-        // Sta scrollen toe (touchmove mag scroll niet blokkeren)
-        document.addEventListener("touchmove", (e) => {
-            // Blokkeer touch-move alleen als nodig
-            if (e.target === this.canvas) {
-                e.preventDefault(); // Alleen voorkomen binnen canvas-element
-            }
-        }, {passive: true}); // Zorg dat scrollen elders mogelijk blijft
     }
 
 
