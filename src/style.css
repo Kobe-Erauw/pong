@@ -3,13 +3,11 @@ body {
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    height: 100vh;
     background: #000000; /* Zwart, CRT-achtergrond */
     font-family: 'Courier New', monospace; /* Retro stijl */
     color: #00ff00; /* Felgroene CRT-tekst */
-    overflow: hidden;
     text-shadow: 0 0 2px #00ff00; /* Glow-effect voor tekst */
 }
 
@@ -17,23 +15,43 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    height: 90vh;
 }
 
-.ui {
+#ui {
     display: flex;
     justify-content: space-between;
+    flex-direction: row;
+    align-items: end;
     width: 90%;
     max-width: 800px;
-    margin-bottom: 20px;
+    margin: 0;
 }
 
-.scoreboard, .leaderboard {
+.high-score {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+#score {
+    font-size: 50px;
+    font-weight: bold;
+    display: block;
+}
+
+.leaderboard {
     background: rgba(0, 0, 0, 0.8); /* Donkere achtergrond met transparantie */
     padding: 15px 20px;
     border-radius: 5px;
     border: 1px solid #00ff00; /* Groen CRT-rand */
     box-shadow: 0 0 10px #00ff00; /* Neon glow */
     text-align: center;
+    width: 50%;
+    margin-bottom: 3rem;
 }
 
 .leaderboard h3 {
@@ -60,5 +78,35 @@ canvas {
     background: #000000; /* Zwart canvas */
     position: relative;
     box-shadow: 0 0 20px #00ff00; /* Glow voor CRT-effect */
-    image-rendering: pixelated; /* Pixel-perfect stijl */
+
+}
+
+@media (max-width: 768px) {
+    body {
+
+    }
+
+    .game-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        height: 90vh;
+    }
+
+    #ui {
+        margin-bottom: 10rem;
+        margin-top: 5rem;
+        width: 80vw;
+    }
+
+
+    .leaderboard {
+        width: 80vw;
+    }
+
+    canvas {
+        transform: rotate(-90deg); /* Canvas roteren */
+        transform-origin: center; /* Roteren om het midden */
+        width: 120%; /* Breedte aanpassen aan rotatie */
+    }
 }

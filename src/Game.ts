@@ -103,6 +103,7 @@ export class Game {
     }
 
     listen() {
+        // Voor toetsenbord-events
         addEventListener("keydown", (e) => {
             if (e.key === "ArrowUp") {
                 e.preventDefault();
@@ -112,7 +113,7 @@ export class Game {
                 e.preventDefault();
                 this.direction = "down";
             }
-        })
+        });
 
         addEventListener("keyup", (e) => {
             if (e.key === "ArrowUp" && this.direction === "up") {
@@ -122,7 +123,35 @@ export class Game {
                 this.direction = "none";
             }
         });
+
+        // Voor touch-events
+        document.addEventListener("touchstart", (e) => {
+            const touch = e.touches[0]; // Eerste aanraking
+            const screenWidth = window.innerWidth; // Breedte van het scherm
+            const touchX = touch.clientX; // X-positie van de aanraking
+
+            // Controleer of de aanraking aan de linker- of rechterkant van het scherm is
+            if (touchX < screenWidth / 2) {
+                this.direction = "up"; // Linkerhelft → paddle omhoog
+            } else {
+                this.direction = "down"; // Rechterhelft → paddle omlaag
+            }
+        });
+
+        document.addEventListener("touchend", () => {
+            // Bij loslaten van de aanraking stoppen met bewegen
+            this.direction = "none";
+        });
+
+        // Sta scrollen toe (touchmove mag scroll niet blokkeren)
+        document.addEventListener("touchmove", (e) => {
+            // Blokkeer touch-move alleen als nodig
+            if (e.target === this.canvas) {
+                e.preventDefault(); // Alleen voorkomen binnen canvas-element
+            }
+        }, {passive: true}); // Zorg dat scrollen elders mogelijk blijft
     }
+
 
     start() {
         this.listen();
