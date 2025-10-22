@@ -2,13 +2,23 @@
 
 A modern take on the classic Pong game with a retro CRT aesthetic, featuring a global leaderboard system and persistent user scores.
 
-![Game Preview](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)
+
+## 🎮 Play Now!
+
+**[Play the game here!](https://pong-9f123.web.app/)**
+
+The game is hosted on Firebase Hosting and everyone is welcome to play. Try to beat the high score and get your name on the global leaderboard!
+
 ## 📸 Preview
+
 ### Gameplay
-![pong-demo.gif](assets/pong-demo.gif)
+![Pong Game Demo](assets/pong-demo.gif)
+
 ### Leaderboard
-![leaderboard-demo.png](assets/leaderboard-demo.png)
+![Leaderboard Demo](assets/leaderboard-demo.png)
+
 ## 🌟 Features
 
 - **Classic Gameplay**: Single-player Pong with increasing difficulty
@@ -104,7 +114,6 @@ The game automatically rotates the canvas 90 degrees on mobile devices for a bet
 ## 📝 License
 
 This project is open source and available under the MIT License.
-
 
 ---
 
