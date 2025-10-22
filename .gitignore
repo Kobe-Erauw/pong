@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+.firebaserc
+.firebase
+firebase.json
+pnpm-workspace.yaml
