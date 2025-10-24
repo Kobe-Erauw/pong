@@ -70,8 +70,8 @@ The game is hosted on Firebase Hosting and everyone is welcome to play. Try to b
 
 1. Clone the repository
 ```bash
-git clone [your-repo-url]
-cd pong-game
+git clone https://github.com/Kobe-Erauw/pong
+cd pong
 ```
 
 2. Install dependencies
