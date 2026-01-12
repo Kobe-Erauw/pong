@@ -7,7 +7,7 @@ A modern take on the classic Pong game with a retro CRT aesthetic, featuring a g
 
 ## 🎮 Play Now!
 
-**[Play the game here!](https://pong-9f123.web.app/)**
+**[Play the game here!](https://pong.kobeerauw.com/)**
 
 The game is hosted on Firebase Hosting and everyone is welcome to play. Try to beat the high score and get your name on the global leaderboard!
 
