@@ -25,13 +25,13 @@ The game is hosted on Firebase Hosting and everyone is welcome to play. Try to b
 - **Retro CRT Aesthetic**: Neon green styling with glowing effects
 - **Global Leaderboard**: Real-time leaderboard powered by Firebase
 - **Persistent Scores**: Your high score is saved and synced across sessions
-- **Touch Support**: Play on mobile devices by touching or dragging on the playing field
+- **Touch Support**: Play on mobile devices by holding the left or right half of the screen
 - **Responsive Design**: The playing field scales to fit any screen and rotates on portrait screens
 
 ## 🎯 How to Play
 
 - **Desktop**: Use ↑ and ↓ arrow keys to control the paddle
-- **Mobile**: Touch or drag on the playing field; the paddle moves to where your finger is
+- **Mobile**: Hold the left half of the screen to move the paddle left, the right half to move it right (in landscape: left = up, right = down). Let go to stop. Tap the trophy button to open the leaderboard (the game pauses while it is open)
 - **Goal**: Keep the ball in play as long as possible - each hit increases your score!
 
 ## 🚀 Technologies Used
@@ -96,7 +96,7 @@ The game uses Firebase Realtime Database for the leaderboard. The configuration 
 
 ## 📱 Mobile Optimization
 
-The playing field always fits on screen, without scrolling. On a portrait screen it is drawn rotated 90 degrees (paddle at the bottom) so it uses the full height; in landscape it is shown as on desktop. Rendering uses the device's pixel ratio, so it stays sharp on high-DPI screens. Touch the playing field to move the paddle to your finger (it moves at the same speed as with the keyboard, so scores stay comparable). Swipe outside the playing field to scroll to the leaderboard.
+The playing field always fits on screen, without scrolling. On a portrait screen it is drawn rotated 90 degrees (paddle at the bottom) so it uses the full height; in landscape it is shown as on desktop. Rendering uses the device's pixel ratio, so it stays sharp on high-DPI screens. On touch devices the whole screen acts as the controller and the page doesn't scroll, so controls never conflict with scrolling. The leaderboard opens as an overlay via the trophy button and the game pauses while it is open.
 
 ## 🎨 Design Features
 

@@ -26,12 +26,4 @@ export class Pallet extends Rectangle {
             }
         }
     }
-
-    // Beweeg het midden van de paddle richting targetY, maar nooit sneller dan de normale snelheid
-    moveTowards(targetY: number, timeExpired: number) {
-        const maxStep = this.speed * timeExpired / 1000;
-        const distance = targetY - (this.position.y + this.size.h / 2);
-        const step = Math.max(-maxStep, Math.min(maxStep, distance));
-        this.position.y = Math.max(0, Math.min(WORLD_HEIGHT - this.size.h, this.position.y + step));
-    }
 }

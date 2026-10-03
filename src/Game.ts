@@ -10,7 +10,7 @@ export class Game {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
     direction: PalletDirection = "none";
-    touchTargetY: number | null = null;
+    paused: boolean = false;
     rotated: boolean = false;
     view: DOMMatrix = new DOMMatrix();
     prevTime: number;
@@ -88,14 +88,11 @@ export class Game {
         const timeElapsed = Math.min(timestamp - this.prevTime, 100);
         this.prevTime = timestamp;
 
-        if (this.touchTargetY !== null) {
-            this.leftPallet.moveTowards(this.touchTargetY, timeElapsed);
-        } else {
+        if (!this.paused) {
             this.leftPallet.move(this.direction, timeElapsed);
+            this.ball.move(timeElapsed);
+            this.checkCollisions();
         }
-        this.ball.move(timeElapsed);
-
-        this.checkCollisions();
 
         this.clearCanvas();
         this.leftPallet.draw();
@@ -150,27 +147,16 @@ export class Game {
         this.ctx.setTransform(this.view);
     }
 
-    // Zet een aanraking om naar een y-positie in het speelveld
-    touchToWorldY(touch: Touch): number {
-        const rect = this.canvas.getBoundingClientRect();
-        if (this.rotated) {
-            return (touch.clientX - rect.left - this.canvas.clientLeft) / this.canvas.clientWidth * WORLD_HEIGHT;
-        }
-        return (touch.clientY - rect.top - this.canvas.clientTop) / this.canvas.clientHeight * WORLD_HEIGHT;
-    }
-
     listen() {
         // Voor toetsenbord-events
         addEventListener("keydown", (e) => {
             if (e.key === "ArrowUp") {
                 e.preventDefault();
                 this.direction = "up";
-                this.touchTargetY = null;
             }
             if (e.key === "ArrowDown") {
                 e.preventDefault();
                 this.direction = "down";
-                this.touchTargetY = null;
             }
         });
 
@@ -183,16 +169,28 @@ export class Game {
             }
         });
 
-        // Voor touch-events: de paddle beweegt naar de plek waar je het speelveld aanraakt
+        // Voor touch-events: het hele speelscherm is de controller.
+        // Linkerhelft vasthouden → paddle naar links (liggend: omhoog), rechterhelft → naar rechts
+        // (liggend: omlaag), niets aanraken → paddle blijft staan.
+        const container = this.canvas.parentElement as HTMLElement;
         const onTouch = (e: TouchEvent) => {
-            e.preventDefault(); // Niet scrollen of zoomen tijdens het spelen
-            const touch = e.targetTouches[0];
-            if (touch) {
-                this.touchTargetY = this.touchToWorldY(touch);
+            if (!(e.target as Element).closest("button")) {
+                e.preventDefault(); // Niet scrollen of zoomen tijdens het spelen
+            }
+            const touches = Array.from(e.touches).filter((touch) => {
+                const target = touch.target as Element;
+                return container.contains(target) && !target.closest("button");
+            });
+            const touch = touches[touches.length - 1]; // De laatst neergezette vinger wint
+            if (!touch) {
+                this.direction = "none";
+            } else {
+                this.direction = touch.clientX < window.innerWidth / 2 ? "up" : "down";
             }
         };
-        this.canvas.addEventListener("touchstart", onTouch, {passive: false});
-        this.canvas.addEventListener("touchmove", onTouch, {passive: false});
+        for (const type of ["touchstart", "touchmove", "touchend", "touchcancel"] as const) {
+            container.addEventListener(type, onTouch, {passive: false});
+        }
     }
 
 
