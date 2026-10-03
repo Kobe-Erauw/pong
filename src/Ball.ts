@@ -1,5 +1,6 @@
 import {Rectangle} from "./rectangle.ts";
 import {Position, Size, Direction} from "./types.ts";
+import {WORLD_HEIGHT, WORLD_WIDTH} from "./world.ts";
 
 
 export class Ball extends Rectangle {
@@ -8,7 +9,7 @@ export class Ball extends Rectangle {
 
     constructor(ctx: CanvasRenderingContext2D) {
         const size: Size = {w: 15, h: 15};
-        const position: Position = {x: (ctx.canvas.width - size.w) / 2, y: (ctx.canvas.height - size.h) / 2}
+        const position: Position = {x: (WORLD_WIDTH - size.w) / 2, y: (WORLD_HEIGHT - size.h) / 2}
         super(position, size, ctx, "#FF7043");
         this.speed = 900;
         this.direction = {x: -1, y: 0};

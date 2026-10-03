@@ -13,14 +13,24 @@
     <div id="ui">
         <div class="score"><span id="score">0</span></div>
         <div class="high-score">High Score: <span id="high-score">0</span></div>
+        <button id="leaderboard-button" class="leaderboard-button" type="button" aria-label="Leaderboard">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/>
+                <path d="M17 6h3v2a3 3 0 0 1-3 3M7 6H4v2a3 3 0 0 0 3 3"/>
+            </svg>
+        </button>
     </div>
     <canvas></canvas>
 </div>
-<div class="leaderboard">
-    <h3>Leaderboard</h3>
-    <ul id="leaderboard-list">
-        <!-- Dynamisch gegenereerde scores -->
-    </ul>
+<div class="leaderboard-overlay">
+    <div class="leaderboard">
+        <h3>Leaderboard</h3>
+        <ul id="leaderboard-list">
+            <!-- Dynamisch gegenereerde scores -->
+        </ul>
+        <button id="leaderboard-close" class="leaderboard-close" type="button">Close</button>
+    </div>
 </div>
 <div class="usernamePopup visible">
     <div class="popup-content">

@@ -25,13 +25,13 @@ The game is hosted on Firebase Hosting and everyone is welcome to play. Try to b
 - **Retro CRT Aesthetic**: Neon green styling with glowing effects
 - **Global Leaderboard**: Real-time leaderboard powered by Firebase
 - **Persistent Scores**: Your high score is saved and synced across sessions
-- **Touch Support**: Play on mobile devices with touch controls
-- **Responsive Design**: Adapts to mobile screens with automatic canvas rotation
+- **Touch Support**: Play on mobile devices by holding the left or right half of the screen
+- **Responsive Design**: The playing field scales to fit any screen and rotates on portrait screens
 
 ## 🎯 How to Play
 
 - **Desktop**: Use ↑ and ↓ arrow keys to control the paddle
-- **Mobile**: Touch the left side of the screen to move up, right side to move down
+- **Mobile**: Hold the left half of the screen to move the paddle left, the right half to move it right (in landscape: left = up, right = down). Let go to stop. Tap the trophy button to open the leaderboard (the game pauses while it is open)
 - **Goal**: Keep the ball in play as long as possible - each hit increases your score!
 
 ## 🚀 Technologies Used
@@ -54,6 +54,7 @@ The game is hosted on Firebase Hosting and everyone is welcome to play. Try to b
 │   ├── DBService.ts      # Firebase integration
 │   ├── CookieService.ts  # User session management
 │   ├── types.ts          # TypeScript type definitions
+│   ├── world.ts          # Playing field dimensions
 │   ├── main.ts           # Application entry point
 │   └── style.css         # CRT aesthetic styling
 └── index.html
@@ -95,7 +96,7 @@ The game uses Firebase Realtime Database for the leaderboard. The configuration 
 
 ## 📱 Mobile Optimization
 
-The game automatically rotates the canvas 90 degrees on mobile devices for a better portrait-mode experience. Touch controls are intuitive: tap left to move up, tap right to move down.
+The playing field always fits on screen, without scrolling. On a portrait screen it is drawn rotated 90 degrees (paddle at the bottom) so it uses the full height; in landscape it is shown as on desktop. Rendering uses the device's pixel ratio, so it stays sharp on high-DPI screens. On touch devices the whole screen acts as the controller and the page doesn't scroll, so controls never conflict with scrolling. The leaderboard opens as an overlay via the trophy button and the game pauses while it is open.
 
 ## 🎨 Design Features
 

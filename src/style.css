@@ -16,7 +16,15 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
     height: 90vh;
+    height: 90svh; /* Houdt rekening met de adresbalk op mobiel */
+    padding: 12px 16px;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: none; /* Aanraken stuurt de paddle i.p.v. te scrollen of zoomen */
 }
 
 #ui {
@@ -24,12 +32,13 @@ body {
     justify-content: space-between;
     flex-direction: row;
     align-items: end;
-    width: 90%;
-    max-width: 800px;
+    width: 100%;
+    max-width: var(--court-width, 800px); /* Even breed als het canvas, gezet vanuit Game.ts */
     margin: 0;
 }
 
 .high-score {
+    margin-left: auto;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -41,6 +50,12 @@ body {
     font-size: 50px;
     font-weight: bold;
     display: block;
+}
+
+.leaderboard-overlay {
+    display: flex;
+    justify-content: center;
+    width: 100%;
 }
 
 .leaderboard {
@@ -70,6 +85,34 @@ body {
 #leaderboard-list li {
     padding: 5px 0;
     border-bottom: 1px solid rgba(0, 255, 0, 0.5);
+}
+
+/* Leaderboard-knop en sluitknop: alleen zichtbaar op touch-toestellen */
+.leaderboard-button {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    margin-left: 12px;
+    padding: 6px;
+    background: #000;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+    border-radius: 5px;
+    box-shadow: 0 0 5px #00ff00;
+    cursor: pointer;
+}
+
+.leaderboard-close {
+    display: none;
+    margin: 15px auto 0;
+    padding: 10px 20px;
+    background: #00ff00;
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 0 5px #00ff00;
 }
 
 .usernamePopup {
@@ -113,6 +156,7 @@ body {
     background: #000;
     color: #00ff00;
     font-family: 'Courier New', monospace;
+    font-size: 16px; /* Kleiner laat iOS inzoomen bij het typen */
     box-shadow: 0 0 5px #00ff00;
 }
 
@@ -140,40 +184,85 @@ body {
 
 
 /* Canvas */
+/* Game.ts past de grootte aan de vrije ruimte in .game-container aan */
 canvas {
+    display: block;
+    flex-shrink: 0;
     border: 8px solid #00ff00; /* Neon groene rand */
     background: #000000; /* Zwart canvas */
     position: relative;
     box-shadow: 0 0 20px #00ff00; /* Glow voor CRT-effect */
-
 }
 
 @media (max-width: 768px) {
-    body {
-
-    }
-
-    .game-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        height: 90vh;
-    }
-
-    #ui {
-        margin-bottom: 10rem;
-        margin-top: 5rem;
-        width: 80vw;
-    }
-
-
     .leaderboard {
         width: 80vw;
     }
 
     canvas {
-        transform: rotate(-90deg); /* Canvas roteren */
-        transform-origin: center; /* Roteren om het midden */
-        width: 120%; /* Breedte aanpassen aan rotatie */
+        border-width: 5px;
+    }
+}
+
+/* Telefoon in landscape: weinig hoogte, dus scherm vullen en kleinere score */
+@media (max-height: 500px) {
+    .game-container {
+        height: 100vh;
+        height: 100svh;
+    }
+
+    #score {
+        font-size: 30px;
+    }
+}
+
+/* Touch-toestellen: het hele scherm is de controller, de pagina scrollt niet
+   en het leaderboard opent als overlay via de knop */
+@media (pointer: coarse) {
+    html, body {
+        height: 100%;
+        overflow: hidden;
+        overscroll-behavior: none;
+    }
+
+    .game-container {
+        height: 100vh;
+        height: 100svh;
+    }
+
+    .leaderboard-button {
+        display: flex;
+    }
+
+    .leaderboard-close {
+        display: block;
+    }
+
+    .leaderboard-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        align-items: center;
+        z-index: 500;
+        background: rgba(0, 0, 0, 0.9);
+        visibility: hidden;
+        opacity: 0;
+        transition: visibility 0s, opacity 0.3s ease-in-out;
+    }
+
+    .leaderboard-overlay.visible {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .leaderboard {
+        box-sizing: border-box;
+        width: 80vw;
+        max-width: 400px;
+        max-height: 80vh;
+        max-height: 80svh;
+        overflow-y: auto;
+        margin: 0;
     }
 }

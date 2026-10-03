@@ -10,12 +10,16 @@ const highScoreElement: HTMLSpanElement = document.querySelector("#high-score") 
 const leaderboardElement: HTMLUListElement = document.querySelector("#leaderboard-list") as HTMLUListElement;
 const usernamePopup = document.querySelector('.usernamePopup') as HTMLDivElement;
 const usernameForm = document.querySelector('#usernameForm') as HTMLFormElement;
+const leaderboardOverlay = document.querySelector('.leaderboard-overlay') as HTMLDivElement;
+const leaderboardButton = document.querySelector('#leaderboard-button') as HTMLButtonElement;
+const leaderboardClose = document.querySelector('#leaderboard-close') as HTMLButtonElement;
 
 const leaderBoard = new LeaderBoard(leaderboardElement);
 const dbService = new DBService(leaderBoard);
 const cookieService: CookieService = new CookieService();
 
 let highScore = 0;
+let game: Game | null = null;
 usernamePopup.classList.remove('visible');
 usernamePopup.classList.add('hidden');
 
@@ -34,9 +38,25 @@ if (!username) {
 }
 
 
+// Op touch-toestellen is het leaderboard een overlay; het spel pauzeert zolang het open is
+leaderboardButton.addEventListener('click', () => setLeaderboardOpen(true));
+leaderboardClose.addEventListener('click', () => setLeaderboardOpen(false));
+leaderboardOverlay.addEventListener('click', (event) => {
+    if (event.target === leaderboardOverlay) {
+        setLeaderboardOpen(false); // Tik naast het leaderboard sluit het
+    }
+});
+
+function setLeaderboardOpen(open: boolean) {
+    leaderboardOverlay.classList.toggle('visible', open);
+    if (game) {
+        game.paused = open;
+    }
+}
+
 // Functie om de game te starten
 function StartGame(username: string, highScore: number) {
-    const game = new Game(canvas, ctx, scoreElement, highScoreElement, dbService, highScore);
+    game = new Game(canvas, ctx, scoreElement, highScoreElement, dbService, highScore);
     game.start();
     dbService.listenForChanges();
 
