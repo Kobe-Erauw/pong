@@ -25,13 +25,13 @@ The game is hosted on Firebase Hosting and everyone is welcome to play. Try to b
 - **Retro CRT Aesthetic**: Neon green styling with glowing effects
 - **Global Leaderboard**: Real-time leaderboard powered by Firebase
 - **Persistent Scores**: Your high score is saved and synced across sessions
-- **Touch Support**: Play on mobile devices with touch controls
-- **Responsive Design**: Adapts to mobile screens with automatic canvas rotation
+- **Touch Support**: Play on mobile devices by touching or dragging on the playing field
+- **Responsive Design**: The playing field scales to fit any screen and rotates on portrait screens
 
 ## 🎯 How to Play
 
 - **Desktop**: Use ↑ and ↓ arrow keys to control the paddle
-- **Mobile**: Touch the left side of the screen to move up, right side to move down
+- **Mobile**: Touch or drag on the playing field; the paddle moves to where your finger is
 - **Goal**: Keep the ball in play as long as possible - each hit increases your score!
 
 ## 🚀 Technologies Used
@@ -54,6 +54,7 @@ The game is hosted on Firebase Hosting and everyone is welcome to play. Try to b
 │   ├── DBService.ts      # Firebase integration
 │   ├── CookieService.ts  # User session management
 │   ├── types.ts          # TypeScript type definitions
+│   ├── world.ts          # Playing field dimensions
 │   ├── main.ts           # Application entry point
 │   └── style.css         # CRT aesthetic styling
 └── index.html
@@ -95,7 +96,7 @@ The game uses Firebase Realtime Database for the leaderboard. The configuration 
 
 ## 📱 Mobile Optimization
 
-The game automatically rotates the canvas 90 degrees on mobile devices for a better portrait-mode experience. Touch controls are intuitive: tap left to move up, tap right to move down.
+The playing field always fits on screen, without scrolling. On a portrait screen it is drawn rotated 90 degrees (paddle at the bottom) so it uses the full height; in landscape it is shown as on desktop. Rendering uses the device's pixel ratio, so it stays sharp on high-DPI screens. Touch the playing field to move the paddle to your finger (it moves at the same speed as with the keyboard, so scores stay comparable). Swipe outside the playing field to scroll to the leaderboard.
 
 ## 🎨 Design Features
 

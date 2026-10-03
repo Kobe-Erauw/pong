@@ -2,6 +2,7 @@ import {Pallet} from "./Pallet.ts";
 import {Ball} from "./Ball.ts";
 import {CanvasSide, PalletDirection} from "./types.ts";
 import {DBService} from "./DBService.ts";
+import {WORLD_HEIGHT, WORLD_WIDTH} from "./world.ts";
 
 export class Game {
     leftPallet: Pallet;
@@ -9,6 +10,9 @@ export class Game {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
     direction: PalletDirection = "none";
+    touchTargetY: number | null = null;
+    rotated: boolean = false;
+    view: DOMMatrix = new DOMMatrix();
     prevTime: number;
     scoreElement: HTMLSpanElement;
     highscoreElement: HTMLSpanElement;
@@ -20,8 +24,6 @@ export class Game {
                 highScoreElement: HTMLSpanElement, dbService: DBService, highScore: number) {
         this.canvas = canvas;
         this.dbService = dbService;
-        canvas.width = 800;
-        canvas.height = 500;
         this.ctx = ctx;
         this.leftPallet = new Pallet(this.ctx);
         this.ball = new Ball(this.ctx);
@@ -32,6 +34,43 @@ export class Game {
         this.score = 0;
         this.highScore = highScore;
         this.setHighScore(highScore);
+        this.resize();
+        new ResizeObserver(() => this.resize()).observe(canvas.parentElement as HTMLElement);
+    }
+
+    // Past het canvas aan de beschikbare ruimte aan. Op een staand scherm wordt het speelveld
+    // 90° gedraaid getekend (paddle onderaan) zodat het de hoogte van het scherm benut.
+    resize() {
+        const container = this.canvas.parentElement as HTMLElement;
+        const style = getComputedStyle(container);
+        const border = this.canvas.offsetWidth - this.canvas.clientWidth;
+        const availW = container.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - border;
+        let availH = container.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) - border;
+        for (const child of Array.from(container.children)) {
+            if (child !== this.canvas) availH -= (child as HTMLElement).offsetHeight; // o.a. de score-balk
+        }
+        const scaleNormal = Math.min(availW / WORLD_WIDTH, availH / WORLD_HEIGHT, 1);
+        const scaleRotated = Math.min(availW / WORLD_HEIGHT, availH / WORLD_WIDTH, 1);
+        this.rotated = scaleRotated > scaleNormal;
+
+        const fieldW = this.rotated ? WORLD_HEIGHT : WORLD_WIDTH;
+        const fieldH = this.rotated ? WORLD_WIDTH : WORLD_HEIGHT;
+        const scale = Math.max(scaleNormal, scaleRotated, 0);
+        const cssW = Math.floor(fieldW * scale);
+        const cssH = Math.floor(fieldH * scale);
+        this.canvas.style.width = `${cssW}px`;
+        this.canvas.style.height = `${cssH}px`;
+        document.documentElement.style.setProperty("--court-width", `${cssW + border}px`);
+
+        // Tekenen op de echte schermresolutie zodat het scherp blijft op retina-schermen
+        const dpr = window.devicePixelRatio || 1;
+        this.canvas.width = Math.round(cssW * dpr);
+        this.canvas.height = Math.round(cssH * dpr);
+        const sx = this.canvas.width / fieldW;
+        const sy = this.canvas.height / fieldH;
+        this.view = this.rotated
+            ? new DOMMatrix([0, -sy, sx, 0, 0, this.canvas.height])
+            : new DOMMatrix([sx, 0, 0, sy, 0, 0]);
     }
 
     getAngleFromPallet(pallet: Pallet) {
@@ -45,10 +84,15 @@ export class Game {
     }
 
     gameLoop(timestamp: number) {
-        const timeElapsed = timestamp - this.prevTime;
+        // Begrens de tijdstap zodat de bal niet wegspringt na een pauze (bv. app op de achtergrond)
+        const timeElapsed = Math.min(timestamp - this.prevTime, 100);
         this.prevTime = timestamp;
 
-        this.leftPallet.move(this.direction, timeElapsed);
+        if (this.touchTargetY !== null) {
+            this.leftPallet.moveTowards(this.touchTargetY, timeElapsed);
+        } else {
+            this.leftPallet.move(this.direction, timeElapsed);
+        }
         this.ball.move(timeElapsed);
 
         this.checkCollisions();
@@ -78,7 +122,7 @@ export class Game {
                 this.resetScore();
             }
             if (canvasside == "right") {
-                this.ball.position.x = this.canvas.width - this.ball.size.w;
+                this.ball.position.x = WORLD_WIDTH - this.ball.size.w;
                 this.ball.direction.x *= -1;
             }
             if (canvasside == "top") {
@@ -86,22 +130,33 @@ export class Game {
                 this.ball.direction.y *= -1;
             }
             if (canvasside == "bottom") {
-                this.ball.position.y = this.canvas.height - this.ball.size.h;
+                this.ball.position.y = WORLD_HEIGHT - this.ball.size.h;
                 this.ball.direction.y *= -1;
             }
         }
     }
 
     ballcollideswithcanvas(ball: Ball): CanvasSide {
-        if (this.ball.position.x > this.canvas.width - ball.size.w) return "right";
+        if (this.ball.position.x > WORLD_WIDTH - ball.size.w) return "right";
         if (this.ball.position.x < 0) return "left";
         if (this.ball.position.y < 0) return "top";
-        if (this.ball.position.y > this.canvas.height - this.ball.size.h) return "bottom";
+        if (this.ball.position.y > WORLD_HEIGHT - this.ball.size.h) return "bottom";
         return null;
     }
 
     clearCanvas() {
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.setTransform(this.view);
+    }
+
+    // Zet een aanraking om naar een y-positie in het speelveld
+    touchToWorldY(touch: Touch): number {
+        const rect = this.canvas.getBoundingClientRect();
+        if (this.rotated) {
+            return (touch.clientX - rect.left - this.canvas.clientLeft) / this.canvas.clientWidth * WORLD_HEIGHT;
+        }
+        return (touch.clientY - rect.top - this.canvas.clientTop) / this.canvas.clientHeight * WORLD_HEIGHT;
     }
 
     listen() {
@@ -110,10 +165,12 @@ export class Game {
             if (e.key === "ArrowUp") {
                 e.preventDefault();
                 this.direction = "up";
+                this.touchTargetY = null;
             }
             if (e.key === "ArrowDown") {
                 e.preventDefault();
                 this.direction = "down";
+                this.touchTargetY = null;
             }
         });
 
@@ -126,25 +183,16 @@ export class Game {
             }
         });
 
-        // Voor touch-events
-        document.addEventListener("touchstart", (e) => {
-            const touch = e.touches[0]; // Eerste aanraking
-            const screenWidth = window.innerWidth; // Breedte van het scherm
-            const touchX = touch.clientX; // X-positie van de aanraking
-
-            // Controleer of de aanraking aan de linker- of rechterkant van het scherm is
-            if (touchX < screenWidth / 2) {
-                this.direction = "up"; // Linkerhelft → paddle omhoog
-            } else {
-                this.direction = "down"; // Rechterhelft → paddle omlaag
+        // Voor touch-events: de paddle beweegt naar de plek waar je het speelveld aanraakt
+        const onTouch = (e: TouchEvent) => {
+            e.preventDefault(); // Niet scrollen of zoomen tijdens het spelen
+            const touch = e.targetTouches[0];
+            if (touch) {
+                this.touchTargetY = this.touchToWorldY(touch);
             }
-        });
-
-        document.addEventListener("touchend", () => {
-            // Bij loslaten van de aanraking stoppen met bewegen
-            this.direction = "none";
-        });
-
+        };
+        this.canvas.addEventListener("touchstart", onTouch, {passive: false});
+        this.canvas.addEventListener("touchmove", onTouch, {passive: false});
     }
 
 

@@ -1,12 +1,13 @@
 import {Rectangle} from "./rectangle.ts";
 import {PalletDirection, Position, Size} from "./types.ts";
+import {WORLD_HEIGHT} from "./world.ts";
 
 export class Pallet extends Rectangle {
     speed: number = 300; // px/second
 
     constructor(ctx: CanvasRenderingContext2D) {
         const size: Size = {w: 10, h: 100};
-        const position: Position = {x: 0, y: (ctx.canvas.height - size.h) / 2}
+        const position: Position = {x: 0, y: (WORLD_HEIGHT - size.h) / 2}
         super(position, size, ctx, "#A5D6A7");
     }
 
@@ -20,9 +21,17 @@ export class Pallet extends Rectangle {
         }
         if (direction === "down") {
             this.position.y += this.speed * timeExpired;
-            if (this.position.y > this.ctx.canvas.height - this.size.h) {
-                this.position.y = this.ctx.canvas.height - this.size.h;
+            if (this.position.y > WORLD_HEIGHT - this.size.h) {
+                this.position.y = WORLD_HEIGHT - this.size.h;
             }
         }
+    }
+
+    // Beweeg het midden van de paddle richting targetY, maar nooit sneller dan de normale snelheid
+    moveTowards(targetY: number, timeExpired: number) {
+        const maxStep = this.speed * timeExpired / 1000;
+        const distance = targetY - (this.position.y + this.size.h / 2);
+        const step = Math.max(-maxStep, Math.min(maxStep, distance));
+        this.position.y = Math.max(0, Math.min(WORLD_HEIGHT - this.size.h, this.position.y + step));
     }
 }
