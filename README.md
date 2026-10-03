@@ -53,6 +53,7 @@ The game is hosted on Firebase Hosting and everyone is welcome to play. Try to b
 │   ├── LeaderBoard.ts    # Leaderboard management and display
 │   ├── DBService.ts      # Firebase integration
 │   ├── CookieService.ts  # User session management
+│   ├── usernameFilter.ts # Username validation and slur filter
 │   ├── types.ts          # TypeScript type definitions
 │   ├── world.ts          # Playing field dimensions
 │   ├── main.ts           # Application entry point
@@ -108,6 +109,8 @@ The playing field always fits on screen, without scrolling. On a portrait screen
 ## 🏆 Leaderboard System
 
 - Scores are stored with usernames and timestamps
+- Usernames are case-insensitive: typing `kobe` logs you in as an existing `Kobe`
+- Usernames are 2-20 characters (letters, numbers, spaces, `-` and `_`) and slurs are rejected, also when disguised (`n1gg3r`, `n_i_g`); names with slurs are never shown on the leaderboard
 - Real-time synchronization across all players
 - Displays time since last score update
 - Automatic sorting by highest score
