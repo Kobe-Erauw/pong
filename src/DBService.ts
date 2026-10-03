@@ -27,8 +27,22 @@ export class DBService {
         this.username = null;
     }
 
-    getScoreFromUsername(username: string) {
-        return get(ref(this.db, "highScores/" + username))
+    // Zoekt een bestaande gebruiker zonder op hoofdletters te letten (kobe vindt Kobe)
+    async findUser(username: string): Promise<HighScore | null> {
+        const snapshot = await get(ref(this.db, "highScores"));
+        const matches: Array<HighScore> = [];
+        snapshot.forEach((child) => {
+            const name = child.key as string;
+            if (name.toLowerCase() === username.toLowerCase()) {
+                const data: HighScoreData = child.val();
+                matches.push({name, score: data.score, date: data.date});
+            }
+        });
+        // Bestaan er van vroeger meerdere varianten (kobe én Kobe): exact dezelfde schrijfwijze eerst,
+        // anders die met de hoogste score
+        return matches.find((match) => match.name === username)
+            ?? matches.sort((a, b) => b.score - a.score)[0]
+            ?? null;
     }
 
     insertHighScore(highScore: HighScore) {

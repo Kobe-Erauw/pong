@@ -2,6 +2,7 @@ import {Game} from "./Game.ts";
 import {DBService} from "./DBService.ts";
 import {LeaderBoard} from "./LeaderBoard.ts";
 import {CookieService} from "./CookieService.ts";
+import {containsBlockedTerm, validateUsername} from "./usernameFilter.ts";
 
 const canvas: HTMLCanvasElement = document.querySelector("canvas") as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -10,6 +11,7 @@ const highScoreElement: HTMLSpanElement = document.querySelector("#high-score") 
 const leaderboardElement: HTMLUListElement = document.querySelector("#leaderboard-list") as HTMLUListElement;
 const usernamePopup = document.querySelector('.usernamePopup') as HTMLDivElement;
 const usernameForm = document.querySelector('#usernameForm') as HTMLFormElement;
+const usernameError = document.querySelector('#username-error') as HTMLParagraphElement;
 const leaderboardOverlay = document.querySelector('.leaderboard-overlay') as HTMLDivElement;
 const leaderboardButton = document.querySelector('#leaderboard-button') as HTMLButtonElement;
 const leaderboardClose = document.querySelector('#leaderboard-close') as HTMLButtonElement;
@@ -18,21 +20,30 @@ const leaderBoard = new LeaderBoard(leaderboardElement);
 const dbService = new DBService(leaderBoard);
 const cookieService: CookieService = new CookieService();
 
-let highScore = 0;
 let game: Game | null = null;
 usernamePopup.classList.remove('visible');
 usernamePopup.classList.add('hidden');
 
-// Controleer of de username bestaat
+// Controleer of de username bestaat (een opgeslagen naam met een slur moet opnieuw gekozen worden)
 const username = cookieService.getUsernameCookie();
-if (!username) {
+if (!username || containsBlockedTerm(username)) {
     showUsernamePopup();
 } else {
-    dbService.getScoreFromUsername(username).then(scoreSnap => {
-        if (scoreSnap) {
-            console.log(scoreSnap.val())
-            highScore = scoreSnap.val().score as number;
-            StartGame(username, highScore);
+    login(username);
+}
+
+// Logt in met een bestaande gebruiker (zonder op hoofdletters te letten) of maakt een nieuwe aan
+function login(username: string) {
+    return dbService.findUser(username).then(existingUser => {
+        const name = existingUser ? existingUser.name : username; // Bestaande schrijfwijze behouden
+        cookieService.setUsernameCookie(name);
+        if (existingUser) {
+            console.log("de user bestaat al in de db")
+            StartGame(name, existingUser.score);
+        } else {
+            console.log("nieuwe user in db gezet")
+            dbService.insertHighScore({name, score: 0, date: null});
+            StartGame(name, 0);
         }
     });
 }
@@ -72,19 +83,15 @@ function showUsernamePopup() {
         event.preventDefault(); // Voorkom standaard formuliergedrag
 
         const usernameInput = document.querySelector('#username') as HTMLInputElement;
-        const username = usernameInput.value.trim();
+        const username = usernameInput.value.trim().replace(/\s+/g, " ");
 
-        dbService.getScoreFromUsername(username).then(scoreSnap => {
-            cookieService.setUsernameCookie(username);
-            if (scoreSnap.val()) {
-                console.log("de user bestaat al in de db")
-                highScore = scoreSnap.val().score as number;
-                StartGame(username, highScore);
-            } else {
-                console.log("nieuwe user in db gezet")
-                dbService.insertHighScore({name: username, score: 0, date: null});
-                StartGame(username, 0);
-            }
+        const error = validateUsername(username);
+        usernameError.textContent = error ?? "";
+        if (error) {
+            return;
+        }
+
+        login(username).then(() => {
             usernamePopup.classList.remove('visible');
             usernamePopup.classList.add('hidden');
         });

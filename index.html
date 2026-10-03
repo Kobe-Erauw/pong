@@ -39,7 +39,11 @@
             <input id="username"
                    type="text"
                    placeholder="Enter your username"
+                   maxlength="20"
+                   autocomplete="off"
+                   spellcheck="false"
                    required>
+            <p id="username-error" class="username-error" role="alert"></p>
             <button type="submit">Submit</button>
         </form>
     </div>

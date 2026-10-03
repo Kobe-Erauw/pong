@@ -1,4 +1,5 @@
 import {HighScore} from "./types.ts";
+import {containsBlockedTerm} from "./usernameFilter.ts";
 
 export class LeaderBoard {
     highScores: Array<HighScore> = [];
@@ -9,6 +10,9 @@ export class LeaderBoard {
     }
 
     addScore(score: HighScore) {
+        if (containsBlockedTerm(score.name)) {
+            return; // Namen met slurs nooit tonen, ook niet als ze buiten de game om in de db gezet zijn
+        }
         this.highScores.push(score);
         this.refresh();
     }
@@ -60,7 +64,7 @@ export class LeaderBoard {
             timeAgo = `${daysAgo} day${daysAgo > 1 ? "s" : ""} ago`;
         }
 
-        li.innerHTML = `${highScore.name} : ${highScore.score} [${timeAgo}]`;
+        li.textContent = `${highScore.name} : ${highScore.score} [${timeAgo}]`; // textContent: namen nooit als HTML uitvoeren
         li.id = highScore.name;
 
         return li;

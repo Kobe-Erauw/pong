@@ -160,6 +160,14 @@ body {
     box-shadow: 0 0 5px #00ff00;
 }
 
+.username-error {
+    min-height: 1.2em;
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: #ff5252;
+    text-shadow: none;
+}
+
 .usernamePopup button {
     padding: 10px 20px;
     background: #00ff00;
